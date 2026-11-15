@@ -62,6 +62,20 @@ class DeliveryTests(unittest.TestCase):
         self.assertEqual(len(landed["sent"]), 2)
         self.assertEqual(len(ha.services.calls), 4)
 
+
+    def test_tv_entity_uses_separate_channel_and_send_message(self):
+        store, ha = FakeStore(), FakeHA()
+        flight = {"flight_number": "DL2084", "departure_date": "2026-10-31"}
+        steps = [
+            {"domain": "notify", "service": "send_message", "data": {"entity_id": ["notify.mobile_app_diegos_iphone"], "message": "test"}},
+            {"channel": "tv", "domain": "notify", "service": "send_message", "data": {"entity_id": ["notify.android_tv_fire_tv_192_168_68_72"], "message": "test"}},
+        ]
+        result = asyncio.run(module.deliver_event(ha, store, flight, "takeoff", steps, enabled=True))
+        self.assertEqual(len(result["sent"]), 2)
+        self.assertEqual(len(ha.services.calls), 2)
+        self.assertIn(("takeoff", "tv", "notify.android_tv_fire_tv_192_168_68_72"), store.outcomes)
+        self.assertEqual(ha.services.calls[1][1], "send_message")
+
     def test_failed_send_stays_reserved(self):
         store, ha = FakeStore(), FakeHA(True)
         flight = {"flight_number": "DL2084", "departure_date": "2026-10-31"}
