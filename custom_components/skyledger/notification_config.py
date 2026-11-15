@@ -34,8 +34,8 @@ def selected_recipients(
             raise ValueError("Phone targets must be notify entities")
         if kind == "alexas" and any(not x.startswith("media_player.") for x in names):
             raise ValueError("Alexa targets must be media players")
-        if kind == "tv_services" and any(not x or "." in x for x in names):
-            raise ValueError("TV targets must be notify service names without domain")
+        if kind == "tv_services" and any(not x or (not x.startswith("notify.") and "." in x) for x in names):
+            raise ValueError("TV targets must be notify entities or legacy service names")
     return {
         "phones": list(dict.fromkeys(channels["phones"])),
         "alexas": list(dict.fromkeys(channels["alexas"])),

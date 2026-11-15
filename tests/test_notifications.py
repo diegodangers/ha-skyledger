@@ -36,7 +36,9 @@ class NotificationTests(unittest.TestCase):
             RECORD, "landing", datetime(2026, 10, 31, 23),
             ["notify.phone_a"], ["media_player.echo"], ["android_tv_fire_tv_192_168_68_72"],
         )
-        self.assertEqual([a["service"] for a in actions], ["send_message", "android_tv_fire_tv_192_168_68_72"])
+        self.assertEqual([a["service"] for a in actions], ["send_message", "send_message"])
+        self.assertEqual(actions[1]["channel"], "tv")
+        self.assertEqual(actions[1]["data"]["entity_id"], ["notify.android_tv_fire_tv_192_168_68_72"])
 
     def test_tv_filtered_when_off(self):
         actions = module.notification_plan(
