@@ -54,10 +54,11 @@ def notification_plan(
             "domain": "notify", "service": "alexa_media",
             "data": {"target": sorted(set(alexas)), "message": message, "data": {"type": "announce"}},
         })
-    for service in sorted(set(televisions)) if tv_is_on else []:
+    for target in sorted(set(televisions)) if tv_is_on else []:
+        entity = target if target.startswith("notify.") else f"notify.{target}"
         steps.append({
-            "domain": "notify", "service": service,
-            "data": {"title": title, "message": message},
+            "channel": "tv", "domain": "notify", "service": "send_message",
+            "data": {"entity_id": [entity], "title": title, "message": message},
         })
     return steps
 
