@@ -13,7 +13,12 @@ def destinations(steps):
         domain, service, data = step["domain"], step["service"], step["data"]
         if domain != "notify":
             raise ValueError("Unexpected notification domain")
-        if service == "send_message":
+        if service == "send_message" and step.get("channel") == "tv":
+            for entity in data.get("entity_id", []):
+                if not entity.startswith("notify."):
+                    raise ValueError("Invalid TV notification entity")
+                yield ("tv", entity, domain, service, {**data, "entity_id": [entity]})
+        elif service == "send_message":
             for entity in data.get("entity_id", []):
                 if not entity.startswith("notify."):
                     raise ValueError("Invalid phone entity")
